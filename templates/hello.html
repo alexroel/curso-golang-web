@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hola, {{ .Name}}</title>
+</head>
+<body>
+    {{ template "header" }}
+    
+    <h2>Hola, {{ .Name }}</h2>
+    <!-- Verifica si esta activo o no -->
+    {{ if .IsActive }}
+    <p>El usuario esta activo.</p>
+    {{ else }}
+    <p>El usuario no esta activo.</p>
+    {{ end }}
+
+    <!-- Es administrador  -->
+    {{ if .HasAdminPermissions "admin" }}
+    <p>Administrador.</p>
+    {{ end }}
+
+    <!-- Si la edad es mayor a 20 -->
+    {{ if (gt .Age 22) }}
+    <p>El usuario tiene más de 20 años. </p>
+    {{ end }}
+
+    <!-- Listar habilidades -->
+    <h3>Habilidades</h3>
+    <ul>
+        {{ range .Skills }}
+        <li>{{ . }}</li>
+        {{ end }}
+    </ul>
+
+    <!-- Lista de cursos -->
+    <h3>Cursos</h3>
+    <ul>
+        {{ range .Courses }}
+        <li>Curso de: {{ .Name }} -Duración: {{ .Duration }} horas.</li>
+        {{ end }}
+    </ul>
+
+    {{ template "footer" }}
+</body>
+</html>

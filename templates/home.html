@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio</title>
+</head>
+<body>
+
+    {{ template "header" }}
+
+    {{ $title := "Hola Mundo"}}
+    {{ $message := "Página de incio."}}
+    <h1>{{ $title }}</h1>
+    <p>{{ $message }}</p>
+
+    <!-- Modificar el valor  -->
+    {{ $message = "Bienvenido a mi web con Go." }}
+    <p>{{ $message }}</p>
+
+    <!-- Uso de funciones  -->
+    <p>{{ greeting }}</p>
+    <p>Resutaldo: {{ sum 10 20 }}</p>
+
+    {{ template "footer" }}
+
+</body>
+</html>
