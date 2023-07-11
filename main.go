@@ -17,22 +17,36 @@ func sum(a, b int) int {
 	return a + b
 }
 
-// Controladores
-func home(w http.ResponseWriter, r *http.Request) {
-	// Mapa de funciones
-	funcs := template.FuncMap{
-		"greeting": greeting,
-		"sum":      sum,
-	}
-	// Cargar y analizar el archivo de plantilla HTML
-	//template, err := template.ParseFiles("templates/home.html")
-	template, err := template.New("home.html").Funcs(funcs).ParseFiles("templates/home.html", "templates/base.html")
-	if err != nil {
-		log.Println("Error al crear la plantilla:", err)
-	}
+// Mapa de funciones
+var funcs = template.FuncMap{
+	"greeting": greeting,
+	"sum":      sum,
+}
+
+// Gargar platillas
+var templates = template.Must(template.New("T").Funcs(funcs).ParseGlob("templates/*.html"))
+var error = template.Must(template.ParseFiles("templates/error/error.html"))
+
+func handlerError(w http.ResponseWriter, status int) {
+	w.WriteHeader(status)
+	error.Execute(w, nil)
+}
+
+func renderTemplate(w http.ResponseWriter, name string, data any) {
+	// Encabezado
+	w.Header().Set("Content-Type", "text/html")
 
 	// Renderizar la plantilla en la respuesta
-	template.Execute(w, nil)
+	err := templates.ExecuteTemplate(w, "home", nil)
+	if err != nil {
+		handlerError(w, http.StatusInternalServerError)
+	}
+}
+
+// Controladores
+func home(w http.ResponseWriter, r *http.Request) {
+	// Renderizar la plantilla
+	renderTemplate(w, "home", nil)
 }
 
 type Course struct {
@@ -55,11 +69,6 @@ func (u User) HasAdminPermissions(key string) bool {
 }
 
 func hello(w http.ResponseWriter, r *http.Request) {
-	// Cargar y analizar el archivo de plantilla HTML
-	template, err := template.New("hello.html").ParseFiles("templates/hello.html", "templates/base.html")
-	if err != nil {
-		log.Println("Error al crear la plantilla:", err)
-	}
 	// Lista de habilidades
 	skills := []string{"Go", "HTML", "CSS", "JavaScript"}
 	// Lista de cursos
@@ -75,7 +84,7 @@ func hello(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Renderizar la plantilla en la respuesta
-	template.Execute(w, user)
+	renderTemplate(w, "hello", user)
 }
 
 func notFoundHandler(w http.ResponseWriter, r *http.Request) {

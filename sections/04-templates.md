@@ -525,4 +525,149 @@ func hello(w http.ResponseWriter, r *http.Request) {
 ~~~
 
 ---
-## 
+## Cargar múltiples plantillas
+Para cargar múltiples plantillas con el paquete html/template de Go, puedes utilizar las funciones ParseFiles, ExecuteTemplate y ParseGlob.
+
+### Uso de Must 
+En Go, la función Must se utiliza en combinación con otras funciones para manejar errores de una manera más concisa. La función Must asume que el valor de retorno no es nulo y que no produce ningún error. Si ocurre un error, Must generará un pánico.
+
+Aquí tienes un ejemplo de cómo se utiliza la función Must en el contexto del paquete `html/template:`
+~~~go
+// Controladores
+func home(w http.ResponseWriter, r *http.Request) {
+	// Mapa de funciones
+	funcs := template.FuncMap{
+		"greeting": greeting,
+		"sum":      sum,
+	}
+	// Cargar y analizar el archivo de plantilla HTML
+	template := template.Must(template.New("home.html").Funcs(funcs).ParseFiles("templates/home.html", "templates/base.html"))
+
+	// Renderizar la plantilla en la respuesta
+	template.Execute(w, nil)
+}
+
+...
+
+func hello(w http.ResponseWriter, r *http.Request) {
+	// Cargar y analizar el archivo de plantilla HTML
+	template := template.Must(template.New("hello.html").ParseFiles("templates/hello.html", "templates/base.html"))
+	// Lista de habilidades
+	skills := []string{"Go", "HTML", "CSS", "JavaScript"}
+	// Lista de cursos
+	courses := []Course{{"Go", 10}, {"JavaScript", 12}, {"HTM y CSS", 13}}
+
+	user := User{
+		Name:     "Alex",
+		Age:      28,
+		IsActive: true,
+		IsAdmin:  true,
+		Skills:   skills,
+		Courses:  courses,
+	}
+
+	// Renderizar la plantilla en la respuesta
+	template.Execute(w, user)
+}
+~~~
+
+### Uso de ExecuteTemplate y ParseGlob
+La función `ExecuteTemplate` y `ParseGlob` son funciones del paquete `html/template` de Go que se utilizan para cargar y ejecutar múltiples plantillas utilizando un patrón glob.
+
+La función ParseGlob se utiliza para cargar múltiples plantillas desde el sistema de archivos utilizando un patrón glob y devuelve un objeto `*template.Template` que representa las plantillas cargadas.
+
+Aquí tienes un ejemplo de cómo utilizar `ParseGlob` para cargar múltiples plantillas desde archivos:
+
+~~~go
+// Mapa de funciones
+var funcs = template.FuncMap{
+	"greeting": greeting,
+	"sum":      sum,
+}
+
+// Gargar platillas
+var templates = template.Must(template.New("T").Funcs(funcs).ParseGlob("templates/*.html"))
+
+// Controladores
+func home(w http.ResponseWriter, r *http.Request) {
+
+	// Renderizar la plantilla en la respuesta
+	err := templates.ExecuteTemplate(w, "home", nil)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func hello(w http.ResponseWriter, r *http.Request) {
+	// Lista de habilidades
+	skills := []string{"Go", "HTML", "CSS", "JavaScript"}
+	// Lista de cursos
+	courses := []Course{{"Go", 10}, {"JavaScript", 12}, {"HTM y CSS", 13}}
+
+	user := User{
+		Name:     "Alex",
+		Age:      28,
+		IsActive: true,
+		IsAdmin:  true,
+		Skills:   skills,
+		Courses:  courses,
+	}
+
+	// Renderizar la plantilla en la respuesta
+	err := templates.ExecuteTemplate(w, "hello", user)
+	if err != nil {
+		panic(err)
+	}
+}
+~~~
+
+Definer las platillas en `home.html` y `hello.html`:
+~~~html
+<!-- home.html -->
+{{ define "home"}}
+...
+
+{{ end }}
+
+<!-- hello.html -->
+{{ define "hello"}}
+...
+
+{{ end }}
+~~~
+
+---
+## Rederizar plantillas
+Crearemos una función reutilizable para renderizar plantillas y devolver un error personalizado y encabezado: 
+~~~go
+func renderTemplate(w http.ResponseWriter, name string, data any) {
+	// Encabezado
+	w.Header().Set("Content-Type", "text/html")
+
+	// Renderizar la plantilla en la respuesta
+	err := templates.ExecuteTemplate(w, "home", nil)
+	if err != nil {
+		http.Error(w, "No es posible retornar platilla", http.StatusInternalServerError)
+	}
+}
+~~~ 
+
+En esta sección, se establece el encabezado de la respuesta HTTP para indicar que el contenido que se enviará será de tipo HTML. Se utiliza `w.Header().Set("Content-Type", "text/html")` para establecer el encabezado `"Content-Type" en "text/html"`.
+
+### Uso de encabezado
+El encabezado en una respuesta HTTP se utiliza para proporcionar información sobre el contenido y la naturaleza de la respuesta. Especifica cómo el cliente (generalmente un navegador web) debe interpretar y procesar la respuesta recibida del servidor.
+
+En el caso específico del encabezado "Content-Type" que se establece en "text/html", se está indicando al cliente que el contenido de la respuesta es un documento HTML. Esto es importante porque permite al cliente saber cómo debe interpretar y mostrar el contenido recibido. El navegador web, por ejemplo, utilizará esta información para renderizar correctamente la página HTML en el navegador del usuario.
+
+El encabezado "Content-Type" es solo uno de los muchos encabezados que se pueden utilizar en una respuesta HTTP para proporcionar información adicional. Otros encabezados comunes incluyen "Content-Length" para indicar la longitud del contenido, "Cache-Control" para controlar la caché del navegador, "Location" para redireccionar el cliente a una nueva ubicación, entre otros.
+
+En resumen, el encabezado en una respuesta HTTP se utiliza para proporcionar metadatos sobre la respuesta y permitir al cliente procesarla adecuadamente. Establecer el encabezado "Content-Type" es especialmente importante para indicar el tipo de contenido que se envía, como HTML, JSON, XML, etc.
+
+Espero que esto aclare el propósito y la importancia del encabezado en una respuesta HTTP. Si tienes más preguntas, ¡no dudes en hacerlas!
+
+---
+## Página de error 
+
+
+
+
