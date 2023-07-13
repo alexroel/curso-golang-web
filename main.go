@@ -25,11 +25,11 @@ var funcs = template.FuncMap{
 
 // Gargar platillas
 var templates = template.Must(template.New("T").Funcs(funcs).ParseGlob("templates/*.html"))
-var error = template.Must(template.ParseFiles("templates/error/error.html"))
+var errorTemplates = template.Must(template.ParseGlob("templates/**/*.html"))
 
-func handlerError(w http.ResponseWriter, status int) {
+func handlerError(w http.ResponseWriter, name string, status int) {
 	w.WriteHeader(status)
-	error.Execute(w, nil)
+	errorTemplates.ExecuteTemplate(w, name, nil)
 }
 
 func renderTemplate(w http.ResponseWriter, name string, data any) {
@@ -37,9 +37,9 @@ func renderTemplate(w http.ResponseWriter, name string, data any) {
 	w.Header().Set("Content-Type", "text/html")
 
 	// Renderizar la plantilla en la respuesta
-	err := templates.ExecuteTemplate(w, "home", nil)
+	err := templates.ExecuteTemplate(w, name, nil)
 	if err != nil {
-		handlerError(w, http.StatusInternalServerError)
+		handlerError(w, "500", http.StatusInternalServerError)
 	}
 }
 
@@ -89,7 +89,7 @@ func hello(w http.ResponseWriter, r *http.Request) {
 
 func notFoundHandler(w http.ResponseWriter, r *http.Request) {
 	// Devolver un error personalizado para páginas no encontradas
-	http.Error(w, "404 - Página no encontrada", http.StatusNotFound)
+	handlerError(w, "404", http.StatusNotFound)
 }
 
 func main() {

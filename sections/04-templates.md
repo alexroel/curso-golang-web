@@ -1,10 +1,37 @@
 # Manejo de plantillas 
 
+1. [Introducción](#introducción)
+2. [Uso de plantillas](#uso-de-plantillas)
+3. [Condicionales](#condicionales)
+4. [Ciclos](#ciclos)
+5. [Variables](#variables)
+6. [Métodos y funciones](#métodos-y-funciones)
+7. [Reutilización de plantillas](#reutilización-de-plantillas)
+8. [Cargar múltiples plantillas](#cargar-múltiples-plantillas)
+9. [Rederizar plantillas](#rederizar-plantillas)
+10. [Página de error](#página-de-error)
+11. [Resumen](#resumen)
 
 
 ---
 ## Introducción
+Bienvenidos a la sección de "Manejo de plantillas" de nuestro curso de Go. En esta sección, aprenderemos cómo utilizar plantillas para generar contenido dinámico en nuestras aplicaciones web.
 
+Las plantillas son una poderosa herramienta que nos permite separar la lógica de presentación de nuestra aplicación, lo que facilita el mantenimiento y la reutilización del código. A lo largo de esta sección, exploraremos varios aspectos del manejo de plantillas en Go.
+
+Comenzaremos por aprender cómo utilizar condicionales y ciclos en nuestras plantillas. Estas características nos permitirán controlar la ejecución y la apariencia del contenido en función de diferentes condiciones y datos proporcionados.
+
+A continuación, exploraremos cómo trabajar con variables en las plantillas. Las variables nos permiten almacenar y acceder a datos en nuestra plantilla, lo que nos brinda flexibilidad y capacidad para adaptar dinámicamente el contenido generado.
+
+También aprenderemos a utilizar métodos y funciones en nuestras plantillas. Estas funciones nos permiten manipular y transformar datos en tiempo de ejecución, lo que agrega una capa adicional de flexibilidad y personalización a nuestras plantillas.
+
+Además, discutiremos la reutilización de plantillas. Veremos cómo podemos crear plantillas base que contengan elementos comunes y cómo extender y personalizar estas plantillas base para generar diferentes vistas en nuestras aplicaciones.
+
+A medida que avanzamos, también exploraremos cómo cargar múltiples plantillas en nuestras aplicaciones y cómo renderizar estas plantillas para generar el contenido final que se enviará al cliente.
+
+Finalmente, abordaremos el tema de las páginas de error. Aprenderemos a personalizar las respuestas de error en nuestras aplicaciones web, utilizando plantillas para mostrar mensajes de error informativos y amigables para el usuario.
+
+En resumen, en esta sección del curso de Go, adquirirás habilidades fundamentales para trabajar con plantillas en tus aplicaciones web. Te proporcionaremos los conocimientos necesarios para utilizar condicionales, ciclos, variables, métodos y funciones en tus plantillas, así como también para cargar múltiples plantillas y personalizar las páginas de error. ¡Comencemos a explorar el emocionante mundo del manejo de plantillas en Go!
 
 ---
 ## Uso de plantillas
@@ -667,7 +694,96 @@ Espero que esto aclare el propósito y la importancia del encabezado en una resp
 
 ---
 ## Página de error 
+El código que proporcionaste muestra cómo puedes utilizar un archivo de plantilla HTML para personalizar la página de error en Go. Para ello, se utiliza el paquete html/template.
 
+~~~go
+var errorTemplates = template.Must(template.ParseGlob("templates/**/*.html"))
+
+func handlerError(w http.ResponseWriter, name string, status int) {
+	w.WriteHeader(status)
+	errorTemplates.ExecuteTemplate(w, name, nil)
+}
+
+// código en el renderTemplate
+func renderTemplate(w http.ResponseWriter, name string, data any) {
+	// Encabezado
+	w.Header().Set("Content-Type", "text/html")
+
+	// Renderizar la plantilla en la respuesta
+	err := templates.ExecuteTemplate(w, name, nil)
+	if err != nil {
+		handlerError(w, "500", http.StatusInternalServerError)
+	}
+}
+~~~
+
+La función `handlerError` en el código que proporcionaste es responsable de manejar el envío de una respuesta de error personalizada al cliente en función del estado proporcionado. 
+
+### Error de página no encontrado 
+
+~~~go
+func notFoundHandler(w http.ResponseWriter, r *http.Request) {
+	// Devolver un error personalizado para páginas no encontradas
+	handlerError(w, "404", http.StatusNotFound)
+}
+~~~
+
+
+Archivo de html de error dentro de `templates/error/500.html`:
+~~~html
+{{ define "500" }}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error</title>
+</head>
+<body>
+    <h3>No es posible retornar platilla.</h3>
+</body>
+</html>
+
+{{ end }}
+~~~
+
+Archivo de html de error dentro de `templates/error/404.html`:
+
+~~~html
+{{ define "404" }}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error</title>
+</head>
+<body>
+    <h3>404 - Página no econtrada</h3>
+</body>
+</html>
+
+{{ end }}
+~~~
+
+---
+## Resumen 
+
+En la sección de "Manejo de plantillas" de nuestro curso de Go, aprendimos cómo utilizar plantillas para generar contenido dinámico en nuestras aplicaciones web. Exploramos varios aspectos del manejo de plantillas en Go.
+
+Comenzamos por aprender cómo utilizar condicionales y ciclos en nuestras plantillas. Estas características nos permitieron controlar la ejecución y la apariencia del contenido en función de diferentes condiciones y datos proporcionados.
+
+Luego, exploramos cómo trabajar con variables en las plantillas. Las variables nos permitieron almacenar y acceder a datos en nuestra plantilla, brindándonos flexibilidad y capacidad para adaptar dinámicamente el contenido generado.
+
+También aprendimos a utilizar métodos y funciones en nuestras plantillas. Estas funciones nos permitieron manipular y transformar datos en tiempo de ejecución, agregando una capa adicional de flexibilidad y personalización a nuestras plantillas.
+
+Además, discutimos la reutilización de plantillas. Vimos cómo crear plantillas base que contienen elementos comunes y cómo extender y personalizar estas plantillas base para generar diferentes vistas en nuestras aplicaciones.
+
+A medida que avanzamos, también exploramos cómo cargar múltiples plantillas en nuestras aplicaciones y cómo renderizar estas plantillas para generar el contenido final que se envía al cliente.
+
+Finalmente, abordamos el tema de las páginas de error. Aprendimos a personalizar las respuestas de error en nuestras aplicaciones web, utilizando plantillas para mostrar mensajes de error informativos y amigables para el usuario.
+
+En resumen, en esta sección del curso de Go, adquiriste habilidades fundamentales para trabajar con plantillas en tus aplicaciones web. Te proporcionamos los conocimientos necesarios para utilizar condicionales, ciclos, variables, métodos y funciones en tus plantillas, así como también para cargar múltiples plantillas y personalizar las páginas de error. ¡Exploraste el emocionante mundo del manejo de plantillas en Go!
 
 
 
