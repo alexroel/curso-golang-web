@@ -10,7 +10,8 @@
 8. [Cargar múltiples plantillas](#cargar-múltiples-plantillas)
 9. [Rederizar plantillas](#rederizar-plantillas)
 10. [Página de error](#página-de-error)
-11. [Resumen](#resumen)
+11. [Archivos estáticos](#archivos-estáticos)
+12. [Resumen](#resumen)
 
 
 ---
@@ -765,6 +766,54 @@ Archivo de html de error dentro de `templates/error/404.html`:
 
 {{ end }}
 ~~~
+
+---
+## Archivos estáticos 
+
+Para cargar archivos estáticos en un proyecto web en Go (también conocido como Golang), generalmente se utiliza un enrutador web y el paquete estándar "http" de Go. Aquí te mostraré un ejemplo sencillo de cómo configurar la carga de archivos estáticos en un proyecto web en Go:
+
+Supongamos que tienes la siguiente estructura de directorios para tu proyecto:
+~~~bash
+- myproject
+  |- main.go
+  |- static
+     |- css
+        |- styles.css
+     |- js
+        |- script.js
+     |- images
+        |- logo.png
+
+~~~
+Importa los paquetes necesarios en tu archivo `main.go` onfigura el enrutador Gorilla Mux y la función para servir los archivos estáticos:
+
+~~~go
+package main
+
+import (
+    "net/http"
+    "github.com/gorilla/mux"
+)
+
+func main() {
+    // Crea un nuevo enrutador Gorilla Mux
+    router := mux.NewRouter()
+
+	// Manejador para servir los archivos estáticos
+	fs := http.FileServer(http.Dir("static"))
+
+	// Ruta para acceder a los archivos estáticos
+	router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", fs))
+
+    // Define tus rutas para el resto de la aplicación web utilizando Gorilla Mux
+    // ...
+
+}
+~~~
+
+-  Crear el manejador para servir los archivos estáticos `fs := http.FileServer(http.Dir("static"))` En esta línea, se crea un manejador fs utilizando el paquete http.FileServer. Este manejador se encarga de servir archivos estáticos desde un directorio específico en el sistema de archivos. Aquí, le decimos al http.FileServer que los archivos estáticos deben ser servidos desde el directorio llamado "static". Esto significa que todos los archivos presentes dentro del directorio "static" serán accesibles a través del servidor web.
+
+- Configurar la ruta para acceder a los archivos estáticos `router.PathPrefix("/static/").Handler(http.StripPrefix("/static/", fs))`. En esta línea, configuramos la ruta que permitirá acceder a los archivos estáticos. Usamos el enrutador Gorilla Mux para ello. La función PathPrefix nos permite definir un prefijo de ruta que se usará para acceder a los archivos estáticos. En este caso, el prefijo de ruta es "/static/". Luego, usamos http.StripPrefix para eliminar el prefijo "/static/" de la URL antes de pasarla al manejador fs. De esta manera, el enrutador redirige todas las solicitudes que coincidan con el prefijo "/static/" al manejador fs, que a su vez se encargará de servir los archivos estáticos desde el directorio "static". Por ejemplo, si tienes un archivo llamado "styles.css" en el directorio "static/css/", podrías acceder a él en tu navegador utilizando la URL "/static/css/styles.css".
 
 ---
 ## Resumen 
